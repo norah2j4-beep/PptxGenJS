@@ -1,117 +1,167 @@
----
-id: html-to-powerpoint
-sidebar_label: HTML-to-PowerPoint
-title: HTML to PowerPoint
----
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CBT Across the Life Span</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-Reproduces an HTML table into 1 or more slides (auto-paging).
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+            direction: ltr;
+        }
 
-- Supported cell styling includes background colors, borders, fonts, padding, etc.
-- Slide margin settings can be set using options, or by providing a Master Slide definition
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
 
-Notes:
+        .slide {
+            display: none;
+            width: 100%;
+            height: calc(100vh - 80px);
+            background: white;
+            padding: 50px;
+            overflow-y: auto;
+            position: relative;
+        }
 
-- CSS styles are only supported down to the cell level (word-level formatting is not supported)
-- Nested tables are not supported in PowerPoint, therefore they cannot be reproduced (only the text will be included)
+        .slide.active {
+            display: block;
+            animation: slideIn 0.5s ease-in-out;
+        }
 
-## HTML to PowerPoint Syntax
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
 
-```javascript
-slide.tableToSlides(htmlElementID);
-slide.tableToSlides(htmlElementID, { OPTIONS });
-```
+        h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-align: center;
+            border-bottom: 3px solid #764ba2;
+            padding-bottom: 15px;
+            font-weight: 700;
+        }
 
-## HTML to PowerPoint Options (`ITableToSlidesOpts`)
+        h2 {
+            color: #764ba2;
+            font-size: 2em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
 
-| Option               | Type    | Default | Description                                        | Possible Values                                                                         |
-| :------------------- | :------ | :------ | :------------------------------------------------- | :-------------------------------------------------------------------------------------- |
-| `x`                  | number  | `1.0`   | horizontal location (inches)                       | 0-256. Table will be placed here on each Slide                                          |
-| `y`                  | number  | `1.0`   | vertical location (inches)                         | 0-256. Table will be placed here on each Slide                                          |
-| `w`                  | number  | `100%`  | width (inches)                                     | 0-256.                                                                                  |
-| `h`                  | number  | `100%`  | height (inches)                                    | 0-256.                                                                                  |
-| `addHeaderToEach`    | boolean | `false` | add table headers to each slide                    | Ex: `{addHeaderToEach: true}`                                                           |
-| `addImage`           | string  |         | add an image to each slide                         | Ex: `{addImage: {image: {path: "images/logo.png"}, options: {x: 1, y: 1, w: 1, h: 1}}}` |
-| `addShape`           | string  |         | add a shape to each slide                          | Use the established syntax                                                              |
-| `addTable`           | string  |         | add a table to each slide                          | Use the established syntax                                                              |
-| `addText`            | string  |         | add text to each slide                             | Use the established syntax                                                              |
-| `autoPage`           | boolean | `true`  | create new slides when content overflows           | Ex: `{autoPage: false}`                                                                 |
-| `autoPageCharWeight` | number  | `0.0`   | character weight used to determine when lines wrap | -1.0 to 1.0. Ex: `{autoPageCharWeight: 0.5}`                                            |
-| `autoPageLineWeight` | number  | `0.0`   | line weight used to determine when tables wrap     | -1.0 to 1.0. Ex: `{autoPageLineWeight: 0.5}`                                            |
-| `colW`               | number  |         | table column widths                                | Array of column widths. Ex: `{colW: [2.0, 3.0, 1.0]}`                                   |
-| `masterSlideName`    | string  |         | master slide to use                                | [Slide Masters](#slide-masters) name. Ex: `{master: 'TITLE_SLIDE'}`                     |
-| `newSlideStartY`     | number  |         | starting location on Slide after initial           | 0-(slide height). Ex: `{newSlideStartY:0.5}`                                            |
-| `slideMargin`        | number  | `1.0`   | margins to use on Slide                            | Use a number for same TRBL, or use array. Ex: `{margin: [1.0,0.5,1.0,0.5]}`             |
+        h3 {
+            color: #667eea;
+            font-size: 1.5em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
 
-## HTML to PowerPoint Table Options
+        h4 {
+            color: #764ba2;
+            font-size: 1.2em;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
 
-Add an `data` attribute to the table's `<th>` tag to manually size columns (inches)
+        p, li {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 10px;
+            color: #333;
+        }
 
-- minimum column width can be specified by using the `data-pptx-min-width` attribute
-- fixed column width can be specified by using the `data-pptx-width` attribute
+        ul, ol {
+            margin-left: 30px;
+            margin-bottom: 15px;
+        }
 
-Example:
+        .controls {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: rgba(102, 126, 234, 0.95);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
 
-```HTML
-<table id="tabAutoPaging" class="tabCool">
-  <thead>
-    <tr>
-      <th data-pptx-min-width="0.6" style="width: 5%">Row</th>
-      <th data-pptx-min-width="0.8" style="width:10%">Last Name</th>
-      <th data-pptx-min-width="0.8" style="width:10%">First Name</th>
-      <th data-pptx-width="8.5"     style="width:75%">Description</th>
-    </tr>
-  </thead>
-  <tbody></tbody>
-</table>
-```
+        button {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            font-family: 'Tajawal', sans-serif;
+        }
 
-## HTML to PowerPoint Notes
+        button:hover {
+            background: #764ba2;
+            color: white;
+            transform: scale(1.05);
+        }
 
-- Your Master Slides should already have defined margins, so a Master Slide name is the only option you'll need most of the time
-- Hidden tables wont auto-size their columns correctly (as the properties are not accurate)
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
 
-## HTML to PowerPoint Examples
+        .slide-counter {
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
 
-```javascript
-// Pass table element ID to tableToSlides function to produce 1-N slides
-pptx.tableToSlides("myHtmlTableID");
+        .highlight {
+            background: #fff3cd;
+            padding: 3px 8px;
+            border-radius: 4px;
+            border-left: 3px solid #ffc107;
+        }
 
-// Optionally, include a Master Slide name for pre-defined margins, background, logo, etc.
-pptx.tableToSlides("myHtmlTableID", { master: "MASTER_SLIDE" });
+        .box {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
 
-// Optionally, add images/shapes/text/tables to each Slide
-pptx.tableToSlides("myHtmlTableID", {
-  addText: { text: "Dynamic Title", options: { x: 1, y: 0.5, color: "0088CC" } },
-});
-pptx.tableToSlides("myHtmlTableID", {
-  addImage: { path: "images/logo.png", x: 10, y: 0.5, w: 1.2, h: 0.75 },
-});
-```
-
-### HTML Table
-
-![HTML-to-PowerPoint Table](./assets/ex-html-to-powerpoint-1.png)
-
-### Resulting Slides
-
-![HTML-to-PowerPoint Presentation](./assets/ex-html-to-powerpoint-2.png)
-
-### Demos
-
-- Working example is available under [/demos](https://github.com/gitbrent/PptxGenJS/tree/master/demos)
-
-## HTML to PowerPoint Creative Solutions
-
-Design a Master Slide that already contains: slide layout, margins, logos, etc., then you can produce
-professional looking Presentations with a single line of code which can be embedded into a link or a button:
-
-Add a button to a webpage that will create a Presentation using whatever table data is present:
-
-```html
-<button onclick="{ var pptx=new PptxGenJS(); pptx.tableToSlides('tableId'); pptx.writeFile(); }" type="button">Export to PPTX</button>
-```
-
-## SharePoint Integration
-
-Placing a button like this into a WebPart is a great way to add "Export to PowerPoint" functionality
-to SharePoint. (You'd also need to add the PptxGenJS bundle `<script>` in that/another WebPart)
+        .example {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding
